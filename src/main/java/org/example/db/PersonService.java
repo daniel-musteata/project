@@ -7,6 +7,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PersonService {
 
@@ -61,6 +64,43 @@ public class PersonService {
             e.printStackTrace();
         }
         return new Person();
+    }
+
+    public static boolean isPersonWithEmail(String email) {
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM person WHERE email = ?")) {
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                   return true;
+                } else {
+                    System.out.println("Person not found.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static List<Person> findAll() {
+        List<Person> people = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             Statement statement = conn.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT * FROM person")) {
+
+                while (resultSet.next()) {
+                    int id = resultSet.getInt("ID");
+                    String name = resultSet.getString("NAME");
+                    String email = resultSet.getString("email");
+
+                    people.add(new Person(id, name, email));
+                }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return people;
     }
 
     public static void deleteById(int personId) {

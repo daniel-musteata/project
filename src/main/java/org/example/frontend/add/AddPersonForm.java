@@ -2,6 +2,7 @@ package org.example.frontend.add;
 
 import org.example.db.DbService;
 import org.example.db.PersonService;
+import org.example.validators.EmailValidator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -27,13 +28,24 @@ public class AddPersonForm extends JFrame {
         add(addButton);
 
         addButton.addActionListener(e -> {
-
             String name = nameTextField.getText();
             String email = emailTextField.getText();
 
-            PersonService.save(name, email);
-            loadPeopleData(personTable);
-            dispose();
+            if (EmailValidator.isValidEmail(email)) {
+                if (!PersonService.isPersonWithEmail(email)) {
+                    PersonService.save(name, email);
+                    loadPeopleData(personTable);
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(AddPersonForm.this,
+                            "This email is taken! Please choose another.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(AddPersonForm.this,
+                        "Invalid email format! Please enter a valid email.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         setSize(300, 150);

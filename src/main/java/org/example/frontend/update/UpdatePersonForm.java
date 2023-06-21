@@ -3,6 +3,7 @@ package org.example.frontend.update;
 import org.example.db.DbService;
 import org.example.db.PersonService;
 import org.example.models.Person;
+import org.example.validators.EmailValidator;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,13 +33,18 @@ public class UpdatePersonForm extends JFrame {
         add(updateButton);
 
         updateButton.addActionListener(e -> {
-
             String name = nameTextField.getText();
             String email = emailTextField.getText();
 
-            PersonService.updatePerson(personId, name, email);
-            loadPeopleData(personTable);
-            dispose();
+            if (EmailValidator.isValidEmail(email)) {
+                PersonService.updatePerson(personId, name, email);
+                loadPeopleData(personTable);
+                dispose();
+            } else  {
+                JOptionPane.showMessageDialog(UpdatePersonForm.this,
+                        "Invalid email format! Please enter a valid email.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         setSize(300, 150);

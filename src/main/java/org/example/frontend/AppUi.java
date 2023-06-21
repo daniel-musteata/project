@@ -7,6 +7,7 @@ import org.example.frontend.add.AddItemForm;
 import org.example.frontend.add.AddPersonForm;
 import org.example.frontend.update.UpdateItemForm;
 import org.example.frontend.update.UpdatePersonForm;
+import org.example.models.Person;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -67,6 +68,7 @@ public class AppUi extends JFrame {
         getTableListener();
 
         setLayout(new BorderLayout());
+        add(personButtonPanel, BorderLayout.SOUTH);
         add(tabbedPane, BorderLayout.CENTER);
         setSize(800, 600);
         setVisible(true);
@@ -96,7 +98,6 @@ public class AppUi extends JFrame {
         itemButtonPanel.add(itemUpdateButton);
         itemButtonPanel.add(itemDeleteButton);
 
-        add(personButtonPanel, BorderLayout.SOUTH);
     }
 
     private void getButtonActions() {
@@ -127,8 +128,15 @@ public class AppUi extends JFrame {
             if (selectedRow != -1) {
                 int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this person?", "Confirmation", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
-                    PersonService.deleteById((int)personTable.getValueAt(selectedRow, 0));
-                    loadPeopleData();
+                    Person person = PersonService.findById((int)personTable.getValueAt(selectedRow, 0));
+                    if (ItemService.getItemsForPerson(person).size() > 0) {
+                        JOptionPane.showMessageDialog(null,
+                                "You can not delete this person. He has items yet",
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        PersonService.deleteById(person.getId());
+                        loadPeopleData();
+                    }
                 }
             }
         });
@@ -136,7 +144,7 @@ public class AppUi extends JFrame {
         itemDeleteButton.addActionListener(e -> {
             int selectedRow = itemTable.getSelectedRow();
             if (selectedRow != -1) {
-                int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this person?", "Confirmation", JOptionPane.YES_NO_OPTION);
+                int confirm = JOptionPane.showConfirmDialog(null, "Are you sure you want to delete this item?", "Confirmation", JOptionPane.YES_NO_OPTION);
                 if (confirm == JOptionPane.YES_OPTION) {
                     ItemService.deleteById((int)itemTable.getValueAt(selectedRow, 0));
                     loadItemsData();
@@ -169,5 +177,4 @@ public class AppUi extends JFrame {
                 left JOIN person ON item.owner_id = person.id
                 """);
     }
-
 }

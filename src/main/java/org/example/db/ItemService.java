@@ -1,12 +1,15 @@
 package org.example.db;
 
 import org.example.models.Item;
+import org.example.models.Person;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ItemService {
 
@@ -27,13 +30,15 @@ public class ItemService {
         }
     }
 
-    public static void updateItem(int itemId, String newName, double newPrice) {
+    public static void updateItem(int itemId, String newName, double newPrice, int ownerId) {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
-            String sql = "UPDATE item SET name = ?, price = ? WHERE id = ?";
+            String sql = "UPDATE item SET name = ?, price = ?, owner_id = ? WHERE id = ?";
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, newName);
             statement.setDouble(2, newPrice);
-            statement.setInt(3, itemId);
+            statement.setInt(3, ownerId);
+            statement.setInt(4, itemId);
+
             int rowsAffected = statement.executeUpdate();
             System.out.println("Rows affected: " + rowsAffected);
         } catch (SQLException e) {
@@ -52,8 +57,9 @@ public class ItemService {
                     int id = resultSet.getInt("ID");
                     String name = resultSet.getString("NAME");
                     double price = resultSet.getDouble("PRICE");
+                    Integer ownerId = resultSet.getInt("owner_id");
 
-                    return new Item(id, name, price);
+                    return new Item(id, name, price, ownerId);
                 } else {
                     System.out.println("ITEM not found.");
                 }
@@ -81,4 +87,25 @@ public class ItemService {
         }
     }
 
+    public static List<Item> getItemsForPerson(Person person) {
+        List<Item> items = new ArrayList<>();
+
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             PreparedStatement stmt = conn.prepareStatement("SELECT * FROM item WHERE OWNER_ID = ?")) {
+
+            stmt.setInt(1, person.getId());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String name = rs.getString("NAME");
+                double price = rs.getDouble("PRICE");
+
+                items.add(new Item(id, name, price));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return items;
+    }
 }

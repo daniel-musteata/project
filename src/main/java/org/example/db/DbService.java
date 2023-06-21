@@ -1,13 +1,9 @@
 package org.example.db;
 
-import org.example.mappers.PersonMapper;
-import org.example.models.Person;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
