@@ -66,6 +66,27 @@ public class PersonService {
         return new Person();
     }
 
+    public static Person findByEmail(String email) {
+        try (Connection conn = DriverManager.getConnection(url, username, password);
+             PreparedStatement statement = conn.prepareStatement("SELECT * FROM person WHERE email = ?")) {
+            statement.setString(1, email);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    int id = resultSet.getInt("ID");
+                    String name = resultSet.getString("NAME");
+
+                    return new Person(id, name, email);
+                } else {
+                    System.out.println("Person not found.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new Person();
+    }
+
     public static boolean isPersonWithEmail(String email) {
         try (Connection conn = DriverManager.getConnection(url, username, password);
              PreparedStatement statement = conn.prepareStatement("SELECT * FROM person WHERE email = ?")) {

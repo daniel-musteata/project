@@ -5,6 +5,7 @@ import org.example.db.ItemService;
 import org.example.db.PersonService;
 import org.example.frontend.add.AddItemForm;
 import org.example.frontend.add.AddPersonForm;
+import org.example.frontend.find.FindPersonForm;
 import org.example.frontend.update.UpdateItemForm;
 import org.example.frontend.update.UpdatePersonForm;
 import org.example.models.Person;
@@ -17,14 +18,19 @@ public class AppUi extends JFrame {
 
     private final JTable personTable;
     private final JTable itemTable;
-    private  JPanel personButtonPanel;
+    private final JTable itemTable2;
+    private JPanel personButtonPanel;
     private JPanel itemButtonPanel;
+    private JPanel itemButtonPanel2;
     private JButton personAddButton;
     private JButton personUpdateButton;
     private JButton personDeleteButton;
+    private JButton personFindButton;
     private JButton itemAddButton;
     private JButton itemUpdateButton;
     private JButton itemDeleteButton;
+    private JTextField itemNameTextField;
+    private JButton findItemButton;
 
     public AppUi() {
         super("App");
@@ -36,6 +42,7 @@ public class AppUi extends JFrame {
                 return false;
             }
         };
+
         DefaultTableModel itemTableModel = new DefaultTableModel() {
             @Override
             public boolean isCellEditable(int row, int column) {
@@ -44,19 +51,30 @@ public class AppUi extends JFrame {
         };
         personTable = new JTable(personTableModel);
         itemTable = new JTable(itemTableModel);
+        itemTable2 = new JTable(itemTableModel);
 
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Person", new JScrollPane(personTable));
         tabbedPane.addTab("Item", new JScrollPane(itemTable));
+        tabbedPane.addTab("Find item by name", new JScrollPane(itemTable2));
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedIndex() == 0) {
                 add(personButtonPanel, BorderLayout.SOUTH);
                 remove(itemButtonPanel);
+                remove(itemButtonPanel2);
                 loadPeopleData();
             } else if (tabbedPane.getSelectedIndex() == 1) {
                 add(itemButtonPanel, BorderLayout.SOUTH);
                 remove(personButtonPanel);
+                remove(itemButtonPanel2);
                 loadItemsData();
+            } else if (tabbedPane.getSelectedIndex() == 2) {
+
+                add(itemButtonPanel2, BorderLayout.NORTH);
+                itemNameTextField.setText("");
+                remove(personButtonPanel);
+                remove(itemButtonPanel);
+                loadItemsByName("");
             }
             revalidate();
             repaint();
@@ -78,10 +96,14 @@ public class AppUi extends JFrame {
         personAddButton = new JButton("Add (Person)");
         personUpdateButton = new JButton("Update (Person)");
         personDeleteButton = new JButton("Delete (Person)");
+        personFindButton = new JButton("Find (Person)");
 
         itemAddButton = new JButton("Add (Item)");
         itemUpdateButton = new JButton("Update (Item)");
         itemDeleteButton = new JButton("Delete (Item)");
+
+        itemNameTextField = new JTextField(20);
+        findItemButton = new JButton("Find item");
 
         personUpdateButton.setEnabled(false);
         personDeleteButton.setEnabled(false);
@@ -92,12 +114,16 @@ public class AppUi extends JFrame {
         personButtonPanel.add(personAddButton);
         personButtonPanel.add(personUpdateButton);
         personButtonPanel.add(personDeleteButton);
+        personButtonPanel.add(personFindButton);
 
         itemButtonPanel = new JPanel();
         itemButtonPanel.add(itemAddButton);
         itemButtonPanel.add(itemUpdateButton);
         itemButtonPanel.add(itemDeleteButton);
 
+        itemButtonPanel2 = new JPanel();
+        itemButtonPanel2.add(findItemButton);
+        itemButtonPanel2.add(itemNameTextField);
     }
 
     private void getButtonActions() {
@@ -151,6 +177,14 @@ public class AppUi extends JFrame {
                 }
             }
         });
+
+        personFindButton.addActionListener(e -> {
+            new FindPersonForm();
+        });
+
+        findItemButton.addActionListener(e -> {
+            loadItemsByName(itemNameTextField.getText());
+        });
     }
 
     private void getTableListener() {
@@ -170,11 +204,16 @@ public class AppUi extends JFrame {
     private void loadPeopleData() {
         DbService.setDataOnTable(personTable, new String[]{},"SELECT * FROM person");
     }
+
     private void loadItemsData() {
         DbService.setDataOnTable(itemTable, new String[] {"id", "name", "price", "owner"}, """
                 SELECT item.id, item.name, item.price, person.name AS owner
                 FROM item
                 left JOIN person ON item.owner_id = person.id
                 """);
+    }
+
+    private void loadItemsByName(String name) {
+        DbService.setDataOnTableItemsByName(itemTable2, name);
     }
 }

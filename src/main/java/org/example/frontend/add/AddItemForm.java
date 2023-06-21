@@ -42,7 +42,6 @@ public class AddItemForm extends JFrame{
             }
         });
 
-
         setSize(300, 150);
         setVisible(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
