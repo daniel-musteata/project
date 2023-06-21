@@ -1,7 +1,5 @@
 package org.example.db;
 
-import org.example.frontend.add.AddPersonForm;
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.sql.*;
@@ -42,7 +40,6 @@ public class DbService {
         }
     }
 
-
     public static void setDataOnTableItemsByName(JTable jTable, String name) {
         try (Connection connection = DriverManager.getConnection(url, username, password);
              PreparedStatement statement = connection.prepareStatement("SELECT * FROM item WHERE name = ?")) {
@@ -70,6 +67,7 @@ public class DbService {
             e.printStackTrace();
         }
     }
+
     private static void populateTable(ResultSet resultSet, DefaultTableModel tableModel, int columnCount) throws SQLException {
         while (resultSet.next()) {
             Object[] rowData = new Object[columnCount];

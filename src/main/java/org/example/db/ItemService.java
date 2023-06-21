@@ -3,11 +3,7 @@ package org.example.db;
 import org.example.models.Item;
 import org.example.models.Person;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -107,5 +103,20 @@ public class ItemService {
             e.printStackTrace();
         }
         return items;
+    }
+
+    public static double getTotalPriceForItems() {
+        try (Connection connection = DriverManager.getConnection(url, username, password)) {
+            String sql = "SELECT SUM(price) FROM item";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    return resultSet.getDouble(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0d;
     }
 }

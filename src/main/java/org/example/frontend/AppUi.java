@@ -29,6 +29,7 @@ public class AppUi extends JFrame {
     private JButton itemAddButton;
     private JButton itemUpdateButton;
     private JButton itemDeleteButton;
+    private JButton itemCalculateSumPricesBtn;
     private JTextField itemNameTextField;
     private JButton findItemButton;
 
@@ -56,7 +57,7 @@ public class AppUi extends JFrame {
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.addTab("Person", new JScrollPane(personTable));
         tabbedPane.addTab("Item", new JScrollPane(itemTable));
-        tabbedPane.addTab("Find item by name", new JScrollPane(itemTable2));
+        tabbedPane.addTab("Find items by name", new JScrollPane(itemTable2));
         tabbedPane.addChangeListener(e -> {
             if (tabbedPane.getSelectedIndex() == 0) {
                 add(personButtonPanel, BorderLayout.SOUTH);
@@ -101,6 +102,7 @@ public class AppUi extends JFrame {
         itemAddButton = new JButton("Add (Item)");
         itemUpdateButton = new JButton("Update (Item)");
         itemDeleteButton = new JButton("Delete (Item)");
+        itemCalculateSumPricesBtn = new JButton("Calculate prices sum");
 
         itemNameTextField = new JTextField(20);
         findItemButton = new JButton("Find item");
@@ -120,6 +122,7 @@ public class AppUi extends JFrame {
         itemButtonPanel.add(itemAddButton);
         itemButtonPanel.add(itemUpdateButton);
         itemButtonPanel.add(itemDeleteButton);
+        itemButtonPanel.add(itemCalculateSumPricesBtn);
 
         itemButtonPanel2 = new JPanel();
         itemButtonPanel2.add(findItemButton);
@@ -176,6 +179,12 @@ public class AppUi extends JFrame {
                     loadItemsData();
                 }
             }
+        });
+
+        itemCalculateSumPricesBtn.addActionListener(e -> {
+            JOptionPane.showMessageDialog(AppUi.this,
+                    ItemService.getTotalPriceForItems() + " MDL"
+            );
         });
 
         personFindButton.addActionListener(e -> {
